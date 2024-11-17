@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+  <script src="sourse.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      /* צבע כחול */
+    }
+
+    .navbar-nav {
+      margin: auto;
+      /* מרכז את הקישורים */
+    }
+
+    .navbar-nav .nav-item {
+      margin: 0 25px;
+      /* מוסיף רווח אופקי של 15 פיקסלים בין הקישורים */
+    }
+
+    .nav-link {
+      color: white !important;
+      /* משנה את צבע הקישורים ללבן */
+    }
+
+    .button-container {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      position: relative;
+    }
+
+
+    .cart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 800px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-header {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      overflow-y: auto;
+      margin-bottom: 20px;
+      max-height: 200px;
+      /* Height for approximately 3 items */
+      border: 1px solid #eee;
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .cart-table th {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      color: #666;
+      position: sticky;
+      top: 0;
+      background-color: white;
+      z-index: 1;
+    }
+
+    .cart-table td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .cart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #ddd;
+    }
+
+    .total-section {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.1em;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkout-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 20px;
+    }
+
+    .close-button {
+      background-color: #ccc;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .action-button {
+      background-color: #ff4444;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .quantity-input {
+      width: 60px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    /* Scrollbar styling */
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    .cart-button {
+      position: relative;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 30px;
+
+    }
+
+
+    .user-button {
+      background-color: #e0e0e0;
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff0000;
+      color: #fff;
+      font-size: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-container {
+      max-width: 400px;
+      /* גובה מקסימלי של הטופס */
+      margin: auto;
+      /* מרכז את הטופס בדף */
+      padding: 20px;
+      /* ריפוד פנימי */
+      border: 1px solid #ccc;
+      /* גבול אפור */
+      border-radius: 5px;
+      /* פינות מעוגלות */
+      background-color: #f8f9fa;
+      /* צבע רקע בהיר */
+    }
+
+    /* #cartList {
+  max-height: 300px; /* הגובה המקסימלי של רשימת המוצרים */
+    /* overflow-y: auto; /* מאפשר גלילה על ציר ה-Y */
+    /* }  */
+  </style>
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" onclick="FormProduct()" href="#">Add product</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="getProduct('table')" href="#">All Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" onclick="getProduct('cards')" href="#">view Products</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#link2" onclick=" SignupForm()">log up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#link2" onclick=" showLoginForm()">log in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#link2" onclick=" LogOut()">log out</a>
+          </li>
+        </ul>
+
+        <div class="button-container">
+          <!-- כפתור עגלת קניות -->
+          <button onclick="displayCart()" id="cartButton" class="cart-button">
+            🛒
+            <span id="cartCount" class="cart-count"></span>
+
+          </button>
+          <!-- כפתור משתמש -->
+          <button id="userButton" class="user-button">
+            👤
+          </button>
+
+        </div>
+
+
+      </div>
+    </div>
+
+  </nav>
+
+  <div id="board"></div>
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div id="test"></div> -->
+<!-- <tbody id="bodytable"></tbody> -->
+</body>
+
+</html>
